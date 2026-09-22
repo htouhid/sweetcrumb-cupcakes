@@ -1,0 +1,63 @@
+<section class="container section">
+  <div class="section-heading">
+    <p class="eyebrow">A BOX FULL OF HAPPINESS</p>
+    <h1>Your Order</h1>
+    <p>{{ cart.totalQuantity() }} sweet little reasons to smile.</p>
+  </div>
+  @if (cart.lines().length) {
+    <div class="cart-layout">
+      <div class="cart-items">
+        @for (line of cart.lines(); track line.product.id) {
+          <article class="cart-item">
+            <a [routerLink]="['/product', line.product.slug]" class="cart-image"
+              ><app-product-image [src]="line.product.image" [alt]="line.product.name"
+            /></a>
+            <div class="item-copy">
+              <h2>
+                <a [routerLink]="['/product', line.product.slug]">{{ line.product.name }}</a>
+              </h2>
+              <p>{{ line.product.price | currency }} each</p>
+              <app-quantity-selector
+                [value]="line.quantity"
+                [max]="line.product.inventoryQuantity"
+                [label]="line.product.name + ' quantity'"
+                (valueChange)="cart.setQuantity(line.product.id, $event)"
+              />
+            </div>
+            <div class="item-total">
+              <strong>{{ line.total | currency }}</strong
+              ><button
+                class="remove"
+                (click)="cart.removeItem(line.product.id)"
+                [attr.aria-label]="'Remove ' + line.product.name"
+              >
+                Remove
+              </button>
+            </div>
+          </article>
+        }
+        <a routerLink="/shop" class="text-link continue">← Continue Shopping</a>
+      </div>
+      <aside class="order-summary">
+        <h2>A little sweetness, boxed.</h2>
+        <div class="subtotal">
+          <span>Order subtotal</span><strong>{{ cart.subtotal() | currency }}</strong>
+        </div>
+        <p>Your treats are saved here for your next visit.</p>
+        <button class="button button-primary" disabled aria-describedby="checkout-note">
+          Proceed to Checkout
+        </button>
+        <p id="checkout-note" class="checkout-note">
+          Checkout is coming soon. This demo does not place orders or take payments.
+        </p>
+      </aside>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <span class="empty-icon" aria-hidden="true">♡</span>
+      <h2>Something sweet belongs here.</h2>
+      <p>Your order is empty. Let’s find your new favorite.</p>
+      <a routerLink="/shop" class="button button-primary">Continue Shopping →</a>
+    </div>
+  }
+</section>

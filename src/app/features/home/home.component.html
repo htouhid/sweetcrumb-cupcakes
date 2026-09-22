@@ -1,0 +1,99 @@
+<section class="hero container">
+  <div class="hero-copy">
+    <p class="eyebrow">HANDCRAFTED · FRESHLY BAKED · MADE WITH LOVE</p>
+    <h1>Little cakes.<br /><em>Big happiness.</em></h1>
+    <p class="intro">
+      Handcrafted cupcakes and cakes made fresh with quality ingredients for everyday treats,
+      celebrations, and everything in between.
+    </p>
+    <div class="hero-buttons">
+      <a class="button button-primary" routerLink="/shop"
+        >Shop Cupcakes <span aria-hidden="true">↗</span></a
+      ><a class="text-link" routerLink="/" fragment="favorites"
+        >Explore Our Favorites <span aria-hidden="true">→</span></a
+      >
+    </div>
+    <div class="hero-footnote">
+      <span aria-hidden="true">✧</span> Small batches. Thoughtful ingredients. Pure joy.
+    </div>
+  </div>
+  <div class="hero-art">
+    <app-product-image
+      src="/images/hero/sweetcrumb-cupcakes-2.jpg"
+      alt="Illustrated strawberry and vanilla cupcakes on a ceramic cake stand"
+      [priority]="true"
+    />
+    <div class="hero-stamp">A little<br /><em>sweetness</em><br />goes a long way</div>
+    <span class="hero-caption">THE SWEETEST PART OF YOUR DAY</span>
+  </div>
+</section>
+<div class="promise-strip">
+  <span>Made fresh, with love</span><span aria-hidden="true">✧</span
+  ><span>Beautiful inside & out</span><span aria-hidden="true">✧</span
+  ><span>A treat for every occasion</span>
+</div>
+<section class="section container">
+  <div class="section-heading centered">
+    <p class="eyebrow">FIND YOUR LITTLE HAPPINESS</p>
+    <h2>Something sweet for everyone</h2>
+    <p>From your everyday favorite to the centerpiece of your celebration.</p>
+  </div>
+  <div class="category-grid">
+    @for (category of catalog.categories; track category.slug) {
+      <a class="category-card" [routerLink]="['/shop', category.slug]"
+        ><div class="category-image">
+          <app-product-image
+            [src]="category.image"
+            [alt]="category.name + ' collection illustration'"
+          />
+        </div>
+        <div class="category-copy">
+          <h3>{{ category.name }}</h3>
+          <p>{{ category.description }}</p>
+          <span>Explore collection <span aria-hidden="true">↗</span></span>
+        </div></a
+      >
+    }
+  </div>
+</section>
+<section class="favorites section" id="favorites">
+  <div class="container">
+    <div class="section-heading split">
+      <div>
+        <p class="eyebrow">TRIED, LOVED & CRUMB-APPROVED</p>
+        <h2>Meet the favorites</h2>
+        <p>The ones you come back for. And dream about a little.</p>
+      </div>
+      <a class="text-link" routerLink="/shop">View all treats <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="product-grid">
+      @for (product of catalog.featured; track product.id) {
+        <app-product-card [product]="product" />
+      }
+    </div>
+  </div>
+</section>
+<section class="section container about-section" id="about">
+  <div class="section-heading centered">
+    <p class="eyebrow">A LITTLE CARE IN EVERY CRUMB</p>
+    <h2>Good things come from the heart.</h2>
+    <p>Simple ingredients. A thoughtful touch. Something worth slowing down for.</p>
+  </div>
+  <div class="values-grid">
+    <article>
+      <span class="value-icon" aria-hidden="true">☀</span>
+      <h3>Freshly Baked</h3>
+      <p>Small batches, baked fresh.<br />Because the little details taste better.</p>
+    </article>
+    <article>
+      <span class="value-icon" aria-hidden="true">❧</span>
+      <h3>Quality Ingredients</h3>
+      <p>Real vanilla, rich chocolate, and care<br />in every ingredient we choose.</p>
+    </article>
+    <article>
+      <span class="value-icon" aria-hidden="true">✧</span>
+      <h3>Made for Celebrations</h3>
+      <p>Big milestones or just-because moments.<br />We make them a little sweeter.</p>
+    </article>
+  </div>
+</section>
