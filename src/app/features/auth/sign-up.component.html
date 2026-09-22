@@ -1,0 +1,130 @@
+<section class="container section auth-layout">
+  <aside class="auth-story">
+    <p class="eyebrow">SOMETHING SWEET STARTS HERE</p>
+    <h1>A little account.<br /><em>A lot to look forward to.</em></h1>
+    <p>Make yourself at home. There’s always room for another sweet tooth at SweetCrumb.</p>
+    <span class="story-flourish" aria-hidden="true">✧</span
+    ><a class="text-link" routerLink="/shop">Explore the collection →</a>
+  </aside>
+  <div class="auth-card">
+    @if (confirmationSent()) {
+      <div class="confirmation" role="status">
+        <p class="eyebrow">ONE LITTLE STEP TO GO</p>
+        <h2>Check your inbox.</h2>
+        <p>
+          If your email is eligible for a new account, you’ll receive a confirmation link. Follow it
+          to confirm your account, then sign in to your little corner of SweetCrumb.
+        </p>
+        <p>
+          Can’t see it? Take a peek in your spam folder. Already have an account? You can sign in
+          below.
+        </p>
+        <a class="button button-primary" routerLink="/sign-in">Back to Sign In</a>
+      </div>
+    } @else {
+      <p class="eyebrow">WELCOME TO THE SWEET SIDE</p>
+      <h2>Create your account</h2>
+      <p class="card-intro">Let’s make your days a little sweeter.</p>
+      <form [formGroup]="form" (ngSubmit)="submit()" [attr.aria-busy]="submitting()" novalidate>
+        <div class="name-fields">
+          <div class="field">
+            <label for="firstName">First Name</label
+            ><input
+              id="firstName"
+              type="text"
+              formControlName="firstName"
+              autocomplete="given-name"
+              [attr.aria-invalid]="invalid('firstName')"
+              [attr.aria-describedby]="invalid('firstName') ? 'firstName-error' : null"
+            />
+            @if (invalid('firstName')) {
+              <p class="field-error" id="firstName-error">Please enter your first name.</p>
+            }
+          </div>
+          <div class="field">
+            <label for="lastName">Last Name</label
+            ><input
+              id="lastName"
+              type="text"
+              formControlName="lastName"
+              autocomplete="family-name"
+              [attr.aria-invalid]="invalid('lastName')"
+              [attr.aria-describedby]="invalid('lastName') ? 'lastName-error' : null"
+            />
+            @if (invalid('lastName')) {
+              <p class="field-error" id="lastName-error">Please enter your last name.</p>
+            }
+          </div>
+        </div>
+        <div class="field">
+          <label for="email">Email</label
+          ><input
+            id="email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            [attr.aria-invalid]="invalid('email')"
+            [attr.aria-describedby]="invalid('email') ? 'email-error' : null"
+          />
+          @if (invalid('email')) {
+            <p class="field-error" id="email-error">Please enter a valid email address.</p>
+          }
+        </div>
+        <div class="field">
+          <label for="password">Password</label
+          ><input
+            id="password"
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+            [attr.aria-invalid]="invalid('password')"
+            [attr.aria-describedby]="
+              invalid('password') ? 'password-hint password-error' : 'password-hint'
+            "
+          />
+          <p class="field-hint" id="password-hint">At least 8 characters.</p>
+          @if (invalid('password')) {
+            <p class="field-error" id="password-error">
+              Please enter a password with at least 8 characters.
+            </p>
+          }
+        </div>
+        <div class="field">
+          <label for="confirmPassword">Confirm Password</label
+          ><input
+            id="confirmPassword"
+            type="password"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+            [attr.aria-invalid]="invalid('confirmPassword') || mismatch()"
+            [attr.aria-describedby]="
+              invalid('confirmPassword') || mismatch() ? 'confirmPassword-error' : null
+            "
+          />
+          @if (invalid('confirmPassword')) {
+            <p class="field-error" id="confirmPassword-error">Please confirm your password.</p>
+          } @else if (mismatch()) {
+            <p class="field-error" id="confirmPassword-error">Your passwords don’t match yet.</p>
+          }
+        </div>
+        @if (error(); as message) {
+          <p class="form-message error-message" role="alert">{{ message }}</p>
+        }
+        <button
+          class="button button-primary submit-button"
+          type="submit"
+          [disabled]="submitting() || auth.authLoading()"
+        >
+          {{
+            submitting()
+              ? 'Creating your account…'
+              : auth.authLoading()
+                ? 'Getting things ready…'
+                : 'Create Account'
+          }}
+        </button>
+      </form>
+      <p class="auth-switch">Already have an account? <a routerLink="/sign-in">Sign In</a></p>
+    }
+  </div>
+</section>

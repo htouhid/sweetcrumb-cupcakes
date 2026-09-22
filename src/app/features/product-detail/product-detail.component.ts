@@ -1,3 +1,4 @@
+import { CatalogStatusComponent } from '../../shared/components/catalog-status/catalog-status.component';
 import { CurrencyPipe } from '@angular/common';
 import { Component, computed, inject, linkedSignal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -8,9 +9,21 @@ import { ProductImageComponent } from '../../shared/components/product-image/pro
 import { QuantitySelectorComponent } from '../../shared/components/quantity-selector/quantity-selector.component';
 @Component({
   selector: 'app-product-detail',
-  imports: [CurrencyPipe, RouterLink, ProductImageComponent, QuantitySelectorComponent],
+  imports: [
+    CatalogStatusComponent,
+    CurrencyPipe,
+    RouterLink,
+    ProductImageComponent,
+    QuantitySelectorComponent,
+  ],
   template: `<section class="container section">
-    @if (product(); as item) {
+    @if (catalog.loading() || catalog.error()) {
+      <app-catalog-status
+        [loading]="catalog.loading()"
+        [error]="catalog.error()"
+        (retry)="catalog.loadProducts(true)"
+      />
+    } @else if (product(); as item) {
       <nav class="breadcrumbs" aria-label="Breadcrumb">
         <a routerLink="/shop">Shop</a><span>/</span
         ><a [routerLink]="['/shop', item.category]">{{ catalog.categoryName(item.category) }}</a
@@ -29,8 +42,10 @@ import { QuantitySelectorComponent } from '../../shared/components/quantity-sele
           <p class="availability">
             {{
               item.available && item.inventoryQuantity > 0
-                ? item.inventoryQuantity + ' available from our bakery'
-                : 'Sold out · back soon'
+                ? item.inventoryQuantity <= 5
+                  ? 'Only ' + item.inventoryQuantity + ' available'
+                  : item.inventoryQuantity + ' available from our bakery'
+                : 'Sold Out · back soon'
             }}
           </p>
           <div class="order-controls">
@@ -48,8 +63,8 @@ import { QuantitySelectorComponent } from '../../shared/components/quantity-sele
               (click)="cart.addItem(item, quantity())"
             >
               {{
-                !item.available
-                  ? 'Sold out'
+                !item.available || item.inventoryQuantity === 0
+                  ? 'Sold Out'
                   : remaining() === 0
                     ? 'All available in your order'
                     : 'Add to Order'

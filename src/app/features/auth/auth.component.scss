@@ -1,0 +1,144 @@
+.auth-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 80px;
+  min-height: 70vh;
+}
+.auth-story h1 {
+  font-size: clamp(38px, 4.5vw, 62px);
+  line-height: 1.15;
+  letter-spacing: -1.5px;
+  margin: 24px 0;
+}
+.auth-story h1 em {
+  color: var(--berry);
+  font-weight: 400;
+}
+.auth-story > p:not(.eyebrow) {
+  color: var(--muted);
+  max-width: 350px;
+  line-height: 1.9;
+  font-size: 14px;
+}
+.story-flourish {
+  display: block;
+  font-size: 65px;
+  color: #ad7d81;
+  margin: 32px 0;
+}
+.auth-card {
+  padding: 38px;
+  border: 1px solid var(--line);
+  background: var(--white);
+  border-radius: 18px;
+  box-shadow: 0 14px 45px #432d2007;
+}
+.auth-card h2 {
+  font-size: 32px;
+  margin: 14px 0;
+}
+.card-intro {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+.field {
+  margin-bottom: 20px;
+}
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 9px;
+}
+.field input {
+  display: block;
+  width: 100%;
+  border: 1px solid #d7c6be;
+  background: var(--cream);
+  border-radius: 7px;
+  padding: 13px;
+  min-height: 46px;
+}
+.field input[aria-invalid='true'] {
+  border-color: var(--berry);
+}
+.field-error {
+  color: #923c4c;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 7px 0 0;
+}
+.field-hint {
+  color: var(--muted);
+  font-size: 11px;
+  margin: 7px 0 0;
+}
+.name-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.submit-button {
+  width: 100%;
+  margin-top: 6px;
+}
+.auth-switch {
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 25px 0 0;
+}
+.auth-switch a {
+  color: var(--berry);
+}
+.form-message {
+  padding: 15px;
+  border-radius: 8px;
+  background: #f3e7e2;
+  font-size: 13px;
+  line-height: 1.8;
+}
+.error-message {
+  color: #813546;
+}
+.confirmation p:not(.eyebrow) {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.9;
+}
+.confirmation .button {
+  margin-top: 20px;
+}
+@media (max-width: 900px) {
+  .auth-layout {
+    gap: 35px;
+  }
+  .auth-card {
+    padding: 26px;
+  }
+}
+@media (max-width: 700px) {
+  .auth-layout {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .auth-story h1 {
+    font-size: 38px;
+  }
+  .story-flourish,
+  .auth-story .text-link {
+    display: none;
+  }
+}
+@media (max-width: 380px) {
+  .name-fields {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .auth-card {
+    padding: 20px;
+  }
+}

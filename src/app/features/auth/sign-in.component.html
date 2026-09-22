@@ -1,0 +1,60 @@
+<section class="container section auth-layout">
+  <aside class="auth-story">
+    <p class="eyebrow">YOUR LITTLE CORNER OF SWEETCRUMB</p>
+    <h1>Welcome back.<br /><em>Life’s a little sweeter here.</em></h1>
+    <p>Your favorite treats. Your special moments. A little space that’s all yours.</p>
+    <span class="story-flourish" aria-hidden="true">✧</span
+    ><a class="text-link" routerLink="/shop">Find something sweet →</a>
+  </aside>
+  <div class="auth-card">
+    <p class="eyebrow">GOOD TO SEE YOU AGAIN</p>
+    <h2>Sign in to SweetCrumb</h2>
+    <p class="card-intro">A little happiness is waiting for you.</p>
+    <form [formGroup]="form" (ngSubmit)="submit()" [attr.aria-busy]="submitting()" novalidate>
+      <div class="field">
+        <label for="email">Email</label
+        ><input
+          id="email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          [attr.aria-invalid]="invalid('email')"
+          [attr.aria-describedby]="invalid('email') ? 'email-error' : null"
+        />
+        @if (invalid('email')) {
+          <p class="field-error" id="email-error">Please enter a valid email address.</p>
+        }
+      </div>
+      <div class="field">
+        <label for="password">Password</label
+        ><input
+          id="password"
+          type="password"
+          formControlName="password"
+          autocomplete="current-password"
+          [attr.aria-invalid]="invalid('password')"
+          [attr.aria-describedby]="invalid('password') ? 'password-error' : null"
+        />
+        @if (invalid('password')) {
+          <p class="field-error" id="password-error">Please enter your password.</p>
+        }
+      </div>
+      @if (error(); as message) {
+        <p class="form-message error-message" role="alert">{{ message }}</p>
+      }
+      @if (auth.initializationError(); as message) {
+        <p class="form-message" role="status">{{ message }}</p>
+      }
+      <button
+        class="button button-primary submit-button"
+        type="submit"
+        [disabled]="submitting() || auth.authLoading()"
+      >
+        {{
+          submitting() ? 'Signing in…' : auth.authLoading() ? 'Getting things ready…' : 'Sign In'
+        }}
+      </button>
+    </form>
+    <p class="auth-switch">New to SweetCrumb? <a routerLink="/sign-up">Create Account</a></p>
+  </div>
+</section>

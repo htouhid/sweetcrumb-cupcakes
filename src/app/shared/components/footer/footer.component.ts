@@ -15,8 +15,7 @@ import { RouterLink } from '@angular/router';
       </div>
       <div>
         <h3>Customer</h3>
-        <span>My Account <small>Coming soon</small></span
-        ><span>My Orders <small>Coming soon</small></span>
+        <a routerLink="/account">My Account</a><a routerLink="/account">My Orders</a>
       </div>
       <div class="footer-note">
         <span class="eyebrow">A LITTLE JOY, EVERY DAY</span>

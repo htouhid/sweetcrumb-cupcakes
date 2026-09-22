@@ -118,3 +118,66 @@ nav a:hover {
     font-size: 25px;
   }
 }
+
+.sign-in {
+  text-decoration: none;
+  display: inline-block;
+}
+.account-area {
+  position: relative;
+  min-width: 0;
+}
+.account-trigger {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.account-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 185px;
+  padding: 8px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px #432d2017;
+}
+.account-menu a,
+.account-menu button {
+  display: block;
+  width: 100%;
+  border: 0;
+  text-align: left;
+  background: none;
+  padding: 13px 12px;
+  font-size: 13px;
+  text-decoration: none;
+  border-radius: 5px;
+}
+.account-menu a:hover,
+.account-menu button:hover {
+  background: #f3e7e2;
+}
+@media (max-width: 650px) {
+  .account-trigger {
+    max-width: 90px;
+  }
+  .header-actions {
+    gap: 8px;
+  }
+}
+@media (max-width: 370px) {
+  .header-inner {
+    flex-wrap: wrap;
+    padding-block: 12px;
+    gap: 8px;
+  }
+  .header-actions {
+    margin-left: auto;
+  }
+  nav {
+    top: 100%;
+  }
+}

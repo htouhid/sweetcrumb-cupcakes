@@ -1,3 +1,5 @@
+import { ProductService } from '../../core/services/product.service';
+import { CatalogStatusComponent } from '../../shared/components/catalog-status/catalog-status.component';
 import { CurrencyPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
@@ -6,10 +8,17 @@ import { ProductImageComponent } from '../../shared/components/product-image/pro
 import { QuantitySelectorComponent } from '../../shared/components/quantity-selector/quantity-selector.component';
 @Component({
   selector: 'app-cart',
-  imports: [CurrencyPipe, RouterLink, ProductImageComponent, QuantitySelectorComponent],
+  imports: [
+    CatalogStatusComponent,
+    CurrencyPipe,
+    RouterLink,
+    ProductImageComponent,
+    QuantitySelectorComponent,
+  ],
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.scss',
 })
 export class CartComponent {
+  readonly catalog = inject(ProductService);
   readonly cart = inject(CartService);
 }

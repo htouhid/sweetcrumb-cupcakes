@@ -1,3 +1,6 @@
+import { ProductService } from './core/services/product.service';
+import { signal } from '@angular/core';
+import { AuthService } from './core/services/auth.service';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { App } from './app';
@@ -6,7 +9,17 @@ describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        {
+          provide: ProductService,
+          useValue: { products: signal([]), loaded: signal(false), byId: () => undefined },
+        },
+        {
+          provide: AuthService,
+          useValue: { authLoading: signal(false), isAuthenticated: signal(false) },
+        },
+      ],
     }).compileComponents();
   });
 

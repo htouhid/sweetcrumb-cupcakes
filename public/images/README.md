@@ -1,9 +1,5 @@
 # SweetCrumb image assets
 
-The SVG illustrations are local visual placeholders. Replace them with final photography whenever ready.
+Product images come from `public.products.image_url`, such as `/images/products/strawberry-dream.png`. Place the corresponding image in `public/images/products/`. The mapper accepts local `/images/` paths and the existing image component provides a graceful fallback when an asset is missing.
 
-- `products/`: product files referenced by `src/app/core/data/products.ts` (currently `<slug>.svg`). Update the image extension/path there when adding JPG, PNG, or WebP photos.
-- `categories/`: four collection images referenced by `CATEGORIES` in that same file.
-- `hero/`: `cupcake-collection.svg`, referenced in the home template. Update its path and alt text when replacing the illustration.
-
-ProductImageComponent displays a branded fallback if an image cannot load. No remote image requests are used.
+Category artwork stays configured in `src/app/core/data/categories.ts`. Hero artwork remains in the home template. Existing image assets are preserved.

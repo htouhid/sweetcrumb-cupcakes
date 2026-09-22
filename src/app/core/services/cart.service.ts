@@ -1,11 +1,32 @@
-import { computed, effect, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, linkedSignal, signal } from '@angular/core';
 import { CartItem, Product } from '../models/product';
 import { ProductService } from './product.service';
 @Injectable({ providedIn: 'root' })
 export class CartService {
   private readonly catalog = inject(ProductService);
   private readonly storageKey = 'sweetcrumb-cart-v1';
-  private readonly items = signal<readonly CartItem[]>(this.restore());
+  private readonly items = linkedSignal<
+    { products: readonly Product[]; loaded: boolean },
+    readonly CartItem[]
+  >({
+    source: () => ({ products: this.catalog.products(), loaded: this.catalog.loaded() }),
+    computation: ({ products, loaded }, previous) => {
+      const saved = previous?.value ?? this.restore();
+      // Preserve saved IDs until a complete, successful catalog fetch is available.
+      if (!loaded) return saved;
+      return saved.flatMap((item) => {
+        const product = products.find((product) => product.id === item.productId);
+        return product?.available && product.inventoryQuantity > 0
+          ? [
+              {
+                productId: item.productId,
+                quantity: Math.min(item.quantity, product.inventoryQuantity),
+              },
+            ]
+          : [];
+      });
+    },
+  });
   readonly announcement = signal('');
   readonly lines = computed(() =>
     this.items().flatMap((item) => {
@@ -83,21 +104,12 @@ export class CartService {
         if (
           !item ||
           typeof item.productId !== 'string' ||
-          !Number.isInteger(item.quantity) ||
+          !Number.isSafeInteger(item.quantity) ||
           item.quantity <= 0
         )
           continue;
-        const product = this.catalog.byId(item.productId);
-        if (
-          !product?.available ||
-          product.inventoryQuantity <= 0 ||
-          result.some((line) => line.productId === product.id)
-        )
-          continue;
-        result.push({
-          productId: product.id,
-          quantity: Math.min(item.quantity, product.inventoryQuantity),
-        });
+        if (result.some((line) => line.productId === item.productId)) continue;
+        result.push({ productId: item.productId, quantity: item.quantity });
       }
       return result;
     } catch {

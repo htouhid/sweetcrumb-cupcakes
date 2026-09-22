@@ -4,7 +4,14 @@
     <h1>Your Order</h1>
     <p>{{ cart.totalQuantity() }} sweet little reasons to smile.</p>
   </div>
-  @if (cart.lines().length) {
+  @if (catalog.loading() || catalog.error()) {
+    <app-catalog-status
+      [loading]="catalog.loading()"
+      [error]="catalog.error()"
+      (retry)="catalog.loadProducts(true)"
+    />
+    <p class="centered">Your saved order is safe while we check the latest availability.</p>
+  } @else if (cart.lines().length) {
     <div class="cart-layout">
       <div class="cart-items">
         @for (line of cart.lines(); track line.product.id) {

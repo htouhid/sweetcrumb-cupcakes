@@ -1,3 +1,4 @@
+import { CatalogStatusComponent } from '../../shared/components/catalog-status/catalog-status.component';
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { ProductService } from '../../core/services/product.service';
@@ -5,7 +6,7 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
 import { ProductImageComponent } from '../../shared/components/product-image/product-image.component';
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, ProductCardComponent, ProductImageComponent],
+  imports: [CatalogStatusComponent, RouterLink, ProductCardComponent, ProductImageComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })

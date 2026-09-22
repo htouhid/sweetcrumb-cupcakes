@@ -1,3 +1,4 @@
+import { CatalogStatusComponent } from '../../shared/components/catalog-status/catalog-status.component';
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -5,7 +6,7 @@ import { ProductService } from '../../core/services/product.service';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 @Component({
   selector: 'app-shop',
-  imports: [RouterLink, ProductCardComponent],
+  imports: [CatalogStatusComponent, RouterLink, ProductCardComponent],
   template: `<section class="container section shop">
     <div class="section-heading centered">
       <p class="eyebrow">A LITTLE SOMETHING TO MAKE YOUR DAY</p>
@@ -28,21 +29,29 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
         >
       }
     </nav>
-    <p class="results" aria-live="polite">
-      {{ filteredProducts().length }} lovely treats{{
-        selectedFilter() === 'all' ? '' : ' · ' + catalog.categoryName(selectedFilter())
-      }}
-    </p>
-    <div class="product-grid">
-      @for (product of filteredProducts(); track product.id) {
-        <app-product-card [product]="product" />
-      } @empty {
-        <div class="empty-state">
-          <h2>No treats in this collection yet.</h2>
-          <a routerLink="/shop" class="button button-primary">Explore all treats</a>
-        </div>
-      }
-    </div>
+    @if (catalog.loading() || catalog.error()) {
+      <app-catalog-status
+        [loading]="catalog.loading()"
+        [error]="catalog.error()"
+        (retry)="catalog.loadProducts(true)"
+      />
+    } @else {
+      <p class="results" aria-live="polite">
+        {{ filteredProducts().length }} lovely treats{{
+          selectedFilter() === 'all' ? '' : ' · ' + catalog.categoryName(selectedFilter())
+        }}
+      </p>
+      <div class="product-grid">
+        @for (product of filteredProducts(); track product.id) {
+          <app-product-card [product]="product" />
+        } @empty {
+          <div class="empty-state">
+            <h2>No treats in this collection yet.</h2>
+            <a routerLink="/shop" class="button button-primary">Explore all treats</a>
+          </div>
+        }
+      </div>
+    }
   </section>`,
   styles: [
     `
@@ -84,9 +93,5 @@ export class ShopComponent {
   readonly catalog = inject(ProductService);
   private readonly params = toSignal(inject(ActivatedRoute).paramMap);
   readonly selectedFilter = computed(() => this.params()?.get('category') ?? 'all');
-  readonly filteredProducts = computed(() =>
-    this.catalog.products.filter(
-      (product) => this.selectedFilter() === 'all' || product.category === this.selectedFilter(),
-    ),
-  );
+  readonly filteredProducts = computed(() => this.catalog.byCategory(this.selectedFilter()));
 }

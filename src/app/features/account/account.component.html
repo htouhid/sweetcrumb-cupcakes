@@ -1,0 +1,65 @@
+<section class="container section account">
+  <div class="section-heading split">
+    <div>
+      <p class="eyebrow">YOUR LITTLE CORNER OF SWEETCRUMB</p>
+      <h1>Welcome back, {{ auth.firstName() }}.</h1>
+      <p>A place for your details and the sweet moments ahead.</p>
+    </div>
+    <button class="button button-outline" (click)="signOut()" [disabled]="auth.authLoading()">
+      {{ auth.authLoading() ? 'Please wait…' : 'Sign Out' }}
+    </button>
+  </div>
+  @if (error(); as message) {
+    <p class="account-message" role="alert">{{ message }}</p>
+  }
+  <div class="account-grid">
+    <section class="account-card details" aria-labelledby="details-title">
+      <p class="eyebrow">ALL ABOUT YOU</p>
+      <h2 id="details-title">Account Details</h2>
+      @if (auth.profileLoading()) {
+        <p role="status">Getting your details ready…</p>
+      }
+      @if (auth.profileError(); as message) {
+        <div class="account-message" role="alert">
+          <p>{{ message }}</p>
+          <button
+            class="button button-outline"
+            (click)="auth.loadProfile()"
+            [disabled]="auth.profileLoading()"
+          >
+            Try again
+          </button>
+        </div>
+      }
+      <dl>
+        <dt>Name</dt>
+        <dd>
+          {{
+            auth.profile()
+              ? (
+                  (auth.profile()?.first_name ?? '') +
+                  ' ' +
+                  (auth.profile()?.last_name ?? '')
+                ).trim() || 'Not provided'
+              : 'Not available yet'
+          }}
+        </dd>
+        <dt>Email</dt>
+        <dd>{{ auth.currentUser()?.email }}</dd>
+      </dl>
+    </section>
+    <div class="orders">
+      <section class="account-card" aria-labelledby="active-orders-title">
+        <span class="card-symbol" aria-hidden="true">♡</span>
+        <h2 id="active-orders-title">Active Orders</h2>
+        <p>No active orders yet.</p>
+        <a routerLink="/shop" class="text-link">Find your next favorite →</a>
+      </section>
+      <section class="account-card" aria-labelledby="history-title">
+        <span class="card-symbol" aria-hidden="true">✧</span>
+        <h2 id="history-title">Order History</h2>
+        <p>Your completed orders will appear here.</p>
+      </section>
+    </div>
+  </div>
+</section>

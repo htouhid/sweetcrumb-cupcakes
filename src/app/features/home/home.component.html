@@ -66,11 +66,23 @@
       </div>
       <a class="text-link" routerLink="/shop">View all treats <span aria-hidden="true">→</span></a>
     </div>
-    <div class="product-grid">
-      @for (product of catalog.featured; track product.id) {
-        <app-product-card [product]="product" />
-      }
-    </div>
+    @if (catalog.loading() || catalog.error()) {
+      <app-catalog-status
+        [loading]="catalog.loading()"
+        [error]="catalog.error()"
+        (retry)="catalog.loadProducts(true)"
+      />
+    } @else {
+      <div class="product-grid">
+        @for (product of catalog.featured(); track product.id) {
+          <app-product-card [product]="product" />
+        } @empty {
+          <p class="empty-state">
+            New favorites are on their way. Explore our collection for something sweet.
+          </p>
+        }
+      </div>
+    }
   </div>
 </section>
 <section class="section container about-section" id="about">

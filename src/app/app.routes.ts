@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 export const routes: Routes = [
   {
     path: '',
@@ -27,6 +28,23 @@ export const routes: Routes = [
     path: 'cart',
     title: 'Your Order | SweetCrumb',
     loadComponent: () => import('./features/cart/cart.component').then((m) => m.CartComponent),
+  },
+  {
+    path: 'sign-up',
+    title: 'Create Account | SweetCrumb',
+    loadComponent: () => import('./features/auth/sign-up.component').then((m) => m.SignUpComponent),
+  },
+  {
+    path: 'sign-in',
+    title: 'Sign In | SweetCrumb',
+    loadComponent: () => import('./features/auth/sign-in.component').then((m) => m.SignInComponent),
+  },
+  {
+    path: 'account',
+    title: 'My Account | SweetCrumb',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/account/account.component').then((m) => m.AccountComponent),
   },
   {
     path: '**',

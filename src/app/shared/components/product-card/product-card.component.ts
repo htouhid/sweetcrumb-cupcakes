@@ -26,9 +26,9 @@ import { ProductImageComponent } from '../product-image/product-image.component'
       <p>{{ product().description }}</p>
       <div class="price-row">
         <strong>{{ product().price | currency }}</strong
-        ><small [class.sold-out]="!product().available">{{
-          !product().available
-            ? 'Back soon'
+        ><small [class.sold-out]="!product().available || product().inventoryQuantity === 0">{{
+          !product().available || product().inventoryQuantity === 0
+            ? 'Sold Out'
             : product().inventoryQuantity <= 5
               ? 'Only ' + product().inventoryQuantity + ' available'
               : 'Freshly baked'
@@ -40,8 +40,8 @@ import { ProductImageComponent } from '../product-image/product-image.component'
         [disabled]="cart.remaining(product()) === 0"
       >
         {{
-          !product().available
-            ? 'Sold out'
+          !product().available || product().inventoryQuantity === 0
+            ? 'Sold Out'
             : cart.remaining(product()) === 0
               ? 'All available in your order'
               : 'Add to Order'
