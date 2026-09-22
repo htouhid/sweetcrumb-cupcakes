@@ -49,17 +49,34 @@
       </dl>
     </section>
     <div class="orders">
-      <section class="account-card" aria-labelledby="active-orders-title">
-        <span class="card-symbol" aria-hidden="true">♡</span>
-        <h2 id="active-orders-title">Active Orders</h2>
-        <p>No active orders yet.</p>
-        <a routerLink="/shop" class="text-link">Find your next favorite →</a>
-      </section>
-      <section class="account-card" aria-labelledby="history-title">
-        <span class="card-symbol" aria-hidden="true">✧</span>
-        <h2 id="history-title">Order History</h2>
-        <p>Your completed orders will appear here.</p>
-      </section>
+      @if (orders.loading()) {
+        <p role="status">Getting your orders ready…</p>
+      } @else if (orders.error(); as message) {
+        <div class="account-message" role="alert">
+          <p>{{ message }}</p>
+          <button class="button button-outline" (click)="orders.getMyOrders()">Try again</button>
+        </div>
+      } @else {
+        <section class="account-card" aria-labelledby="active-orders-title">
+          <span class="card-symbol" aria-hidden="true">♡</span>
+          <h2 id="active-orders-title">Active Orders</h2>
+          @for (order of orders.activeOrders(); track order.id) {
+            <app-order-card [order]="order" />
+          } @empty {
+            <p>No active orders yet.</p>
+          }
+          <a routerLink="/shop" class="text-link">Find your next favorite →</a>
+        </section>
+        <section class="account-card" aria-labelledby="history-title">
+          <span class="card-symbol" aria-hidden="true">✧</span>
+          <h2 id="history-title">Order History</h2>
+          @for (order of orders.orderHistory(); track order.id) {
+            <app-order-card [order]="order" />
+          } @empty {
+            <p>Your completed orders will appear here.</p>
+          }
+        </section>
+      }
     </div>
   </div>
 </section>

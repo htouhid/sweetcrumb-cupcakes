@@ -47,6 +47,22 @@ export const routes: Routes = [
       import('./features/account/account.component').then((m) => m.AccountComponent),
   },
   {
+    path: 'checkout',
+    title: 'Your Pickup Order | SweetCrumb',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/checkout/checkout.component').then((m) => m.CheckoutComponent),
+  },
+  {
+    path: 'order-confirmation/:orderNumber',
+    title: 'Order Received | SweetCrumb',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/order-confirmation/order-confirmation.component').then(
+        (m) => m.OrderConfirmationComponent,
+      ),
+  },
+  {
     path: '**',
     title: 'Page not found | SweetCrumb',
     loadComponent: () => import('./features/not-found.component').then((m) => m.NotFoundComponent),

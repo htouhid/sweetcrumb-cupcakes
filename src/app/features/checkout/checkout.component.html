@@ -1,0 +1,166 @@
+<section class="container section checkout">
+  <div class="section-heading">
+    <p class="eyebrow">ONE STEP CLOSER TO SOMETHING SWEET</p>
+    <h1>Make it a SweetCrumb day.</h1>
+    <p>Review your treats and tell us when you’d like to pick them up.</p>
+  </div>
+  @if (error(); as message) {
+    <div class="checkout-message" role="alert">
+      <p>{{ message }}</p>
+      <a routerLink="/cart">Review your cart</a> · <a routerLink="/account">My Orders</a>
+    </div>
+  }
+  @if (completed()) {
+    <div class="empty-state">
+      <h2>Your order is in!</h2>
+      <a class="button button-primary" routerLink="/account">View My Orders</a>
+    </div>
+  } @else if (catalog.loading() || catalog.error()) {
+    <app-catalog-status
+      [loading]="catalog.loading()"
+      [error]="catalog.error()"
+      (retry)="catalog.loadProducts(true)"
+    />
+  } @else if (!cart.lines().length) {
+    <div class="empty-state">
+      <h2>A little sweetness belongs here.</h2>
+      <p>Your cart is empty. Find your favorites before checking out.</p>
+      <a class="button button-primary" routerLink="/shop">Explore the collection</a>
+    </div>
+  } @else {
+    <form
+      class="checkout-grid"
+      [formGroup]="form"
+      (ngSubmit)="submit()"
+      novalidate
+      [attr.aria-busy]="submitting()"
+    >
+      <section class="checkout-card">
+        <p class="eyebrow">MADE FOR YOUR MOMENT</p>
+        <h2>Your details & pickup</h2>
+        <fieldset [disabled]="submitting()">
+          <legend class="sr-only">Customer and pickup information</legend>
+          <div class="field">
+            <label for="customerName">Customer Name</label
+            ><input
+              id="customerName"
+              formControlName="customerName"
+              autocomplete="name"
+              required
+              [attr.aria-invalid]="invalid('customerName')"
+              aria-describedby="name-error"
+            />
+            @if (invalid('customerName')) {
+              <p id="name-error" class="field-error">Please enter your name.</p>
+            }
+          </div>
+          <div class="field">
+            <label for="checkoutEmail">Email</label
+            ><input
+              id="checkoutEmail"
+              type="email"
+              [value]="auth.currentUser()?.email ?? ''"
+              readonly
+              autocomplete="email"
+            /><small>From your SweetCrumb account.</small>
+          </div>
+          <div class="field">
+            <label for="phone">Phone <span>(optional)</span></label
+            ><input id="phone" type="tel" formControlName="phone" autocomplete="tel" />
+          </div>
+          <div class="pickup-fields">
+            <div class="field">
+              <label for="pickupDate">Pickup Date</label
+              ><input
+                id="pickupDate"
+                type="date"
+                formControlName="pickupDate"
+                [min]="today"
+                required
+                [attr.aria-invalid]="invalid('pickupDate')"
+                aria-describedby="date-error"
+              />
+              @if (invalid('pickupDate')) {
+                <p id="date-error" class="field-error">Choose today or a future date.</p>
+              }
+            </div>
+            <div class="field">
+              <label for="pickupTime">Pickup Time</label
+              ><input
+                id="pickupTime"
+                type="time"
+                formControlName="pickupTime"
+                required
+                [attr.aria-invalid]="invalid('pickupTime')"
+                aria-describedby="time-error"
+              />
+              @if (invalid('pickupTime')) {
+                <p id="time-error" class="field-error">Please choose a pickup time.</p>
+              }
+            </div>
+          </div>
+          <div class="field">
+            <label for="instructions">Special Instructions <span>(optional)</span></label
+            ><textarea
+              id="instructions"
+              rows="4"
+              formControlName="specialInstructions"
+              maxlength="500"
+              [attr.aria-invalid]="invalid('specialInstructions')"
+              aria-describedby="instructions-hint instructions-error"
+            ></textarea
+            ><small id="instructions-hint"
+              >{{ form.controls.specialInstructions.value.length }}/500 characters</small
+            >
+            @if (invalid('specialInstructions')) {
+              <p id="instructions-error" class="field-error">
+                Please keep instructions to 500 characters.
+              </p>
+            }
+          </div>
+        </fieldset>
+        <a class="text-link" routerLink="/cart">← Back to your cart</a>
+      </section>
+      <aside class="checkout-card summary">
+        <p class="eyebrow">A BOX FULL OF HAPPINESS</p>
+        <h2>Your order</h2>
+        @for (line of cart.lines(); track line.product.id) {
+          <article class="summary-line">
+            <app-product-image [src]="line.product.image" [alt]="line.product.name" />
+            <div>
+              <h3>{{ line.product.name }}</h3>
+              <p>{{ line.quantity }} × {{ line.product.price | currency }}</p>
+            </div>
+            <strong>{{ line.total | currency }}</strong>
+          </article>
+        }
+        <div class="summary-total">
+          <span>Subtotal</span><strong>{{ cart.subtotal() | currency }}</strong>
+        </div>
+        <p class="summary-note">
+          We’ll confirm current prices and availability when you place your order.
+        </p>
+        @if (cart.needsInventoryReview()) {
+          <p class="field-error">
+            Availability has changed. Please <a routerLink="/cart">review your cart</a> before
+            continuing.
+          </p>
+        }
+        <button
+          class="button button-primary"
+          type="submit"
+          [disabled]="
+            submitting() || orders.placingOrder() || cart.needsInventoryReview() || uncertain()
+          "
+        >
+          {{ submitting() ? 'Placing your order…' : 'Place Order' }}
+        </button>
+        @if (uncertain()) {
+          <p class="summary-note">
+            <a routerLink="/account">Check My Orders</a> before returning to checkout to try again.
+          </p>
+        }
+      </aside>
+    </form>
+  }
+</section>

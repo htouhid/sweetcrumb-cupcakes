@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { AuthService, authErrorMessage } from '../../core/services/auth.service';
 @Component({
   selector: 'app-sign-in',
@@ -11,6 +11,7 @@ import { AuthService, authErrorMessage } from '../../core/services/auth.service'
 export class SignInComponent {
   readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   readonly submitting = signal(false);
   readonly error = signal<string | null>(null);
   readonly form = inject(FormBuilder).nonNullable.group({
@@ -31,7 +32,8 @@ export class SignInComponent {
     try {
       await this.auth.signIn(email, password);
       this.form.controls.password.reset();
-      await this.router.navigateByUrl('/account');
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+      await this.router.navigateByUrl(returnUrl === '/checkout' ? '/checkout' : '/account');
     } catch (error) {
       this.error.set(authErrorMessage(error));
     } finally {

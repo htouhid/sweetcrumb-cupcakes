@@ -24,6 +24,17 @@
                 <a [routerLink]="['/product', line.product.slug]">{{ line.product.name }}</a>
               </h2>
               <p>{{ line.product.price | currency }} each</p>
+              @if (!line.product.available || line.quantity > line.product.inventoryQuantity) {
+                <p role="status">
+                  {{
+                    line.product.inventoryQuantity > 0
+                      ? 'Only ' +
+                        line.product.inventoryQuantity +
+                        ' available. Reduce the quantity to continue.'
+                      : 'Sold Out. Please remove this treat.'
+                  }}
+                </p>
+              }
               <app-quantity-selector
                 [value]="line.quantity"
                 [max]="line.product.inventoryQuantity"
@@ -51,11 +62,18 @@
           <span>Order subtotal</span><strong>{{ cart.subtotal() | currency }}</strong>
         </div>
         <p>Your treats are saved here for your next visit.</p>
-        <button class="button button-primary" disabled aria-describedby="checkout-note">
-          Proceed to Checkout
-        </button>
+        @if (cart.needsInventoryReview()) {
+          <p role="status">
+            Some quantities are no longer available. Adjust them or remove sold-out treats before
+            checkout.
+          </p>
+        } @else {
+          <a class="button button-primary" routerLink="/checkout" aria-describedby="checkout-note"
+            >Proceed to Checkout</a
+          >
+        }
         <p id="checkout-note" class="checkout-note">
-          Checkout is coming soon. This demo does not place orders or take payments.
+          Review your order and choose a pickup time at checkout.
         </p>
       </aside>
     </div>

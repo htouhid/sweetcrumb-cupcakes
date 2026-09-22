@@ -54,4 +54,23 @@ describe('authGuard', () => {
     );
     expect(result).toEqual(TestBed.inject(Router).createUrlTree(['/sign-in']));
   });
+  it('preserves checkout as the destination for sign-in', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([]),
+        {
+          provide: AuthService,
+          useValue: { initialize: () => Promise.resolve(), isAuthenticated: () => false },
+        },
+      ],
+    });
+    const result = await TestBed.runInInjectionContext(() =>
+      authGuard({} as ActivatedRouteSnapshot, { url: '/checkout' } as RouterStateSnapshot),
+    );
+    expect(result).toEqual(
+      TestBed.inject(Router).createUrlTree(['/sign-in'], {
+        queryParams: { returnUrl: '/checkout' },
+      }),
+    );
+  });
 });

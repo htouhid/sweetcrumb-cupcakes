@@ -1,0 +1,70 @@
+.confirmation {
+  max-width: 850px;
+  text-align: center;
+  min-height: 65vh;
+}
+.confirmation-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 48px;
+}
+.confirmation-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  color: var(--berry);
+  background: #f0e0d9;
+  font-size: 30px;
+  margin-bottom: 24px;
+}
+h1 {
+  font-size: clamp(36px, 5vw, 56px);
+  margin: 15px 0;
+}
+h2 {
+  font-size: 25px;
+}
+p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.9;
+}
+dl {
+  background: #f6eee7;
+  padding: 24px;
+  border-radius: 10px;
+  margin: 30px 0;
+}
+dl div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 10px 0;
+  font-size: 13px;
+}
+dt {
+  color: var(--muted);
+}
+dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  text-align: right;
+}
+.confirmation-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 25px;
+}
+@media (max-width: 500px) {
+  .confirmation-card {
+    padding: 28px 20px;
+  }
+  dl {
+    padding: 15px;
+  }
+}
