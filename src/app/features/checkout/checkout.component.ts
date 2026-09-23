@@ -98,6 +98,8 @@ export class CheckoutComponent {
       this.cart.clear();
       // A refresh/navigation failure must never turn an accepted order into a retryable submission.
       void this.catalog.loadProducts(true);
+      // Do not await mail: confirmation must remain available even if notification delivery fails.
+      void this.orders.sendOrderEmails(result.order_id).catch(() => undefined);
       await this.router.navigate(['/order-confirmation', result.order_number]);
     } catch (error) {
       if (this.completed()) {

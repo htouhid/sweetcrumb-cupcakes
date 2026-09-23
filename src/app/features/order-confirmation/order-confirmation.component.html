@@ -11,6 +11,17 @@
       <h1>Your order is in!</h1>
       <h2>Thank you, {{ auth.firstName() }}.</h2>
       <p>SweetCrumb has received your order. You can follow its status from your account.</p>
+      @if (emailStatus(); as notification) {
+        @if (notification.state === 'partial' || notification.state === 'failed') {
+          <p class="notification-note" role="status">
+            Your order was placed successfully, but we couldn't send all email notifications.
+          </p>
+        } @else if (notification.state === 'unknown') {
+          <p class="notification-note" role="status">
+            Your order was placed successfully, but we couldn't confirm all email notifications.
+          </p>
+        }
+      }
       <dl>
         <div>
           <dt>Order Number</dt>

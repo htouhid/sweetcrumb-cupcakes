@@ -51,6 +51,7 @@
               "outputHashing": "all"
             },
             "development": {
+              "browser": "src/main.development.ts",
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true

@@ -1,5 +1,5 @@
 import { CurrencyPipe } from '@angular/common';
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -19,6 +19,10 @@ export class OrderConfirmationComponent {
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly labels = ORDER_STATUS_LABELS;
+  readonly emailStatus = computed(() => {
+    const order = this.result();
+    return order ? this.orders.emailStatusFor(order.order_id) : null;
+  });
   private revision = 0;
   constructor() {
     effect(() => {

@@ -1,4 +1,5 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { OrderEmailStatus, parseOrderEmailStatus } from '../models/order-email';
+import { computed, inject, Injectable, isDevMode, signal } from '@angular/core';
 import { AuthService } from './auth.service';
 import { SupabaseService } from './supabase.service';
 import {
@@ -74,6 +75,73 @@ export class OrderService {
   readonly activeOrders = computed(() => this.orders().filter(isActiveOrder));
   readonly orderHistory = computed(() => this.orders().filter((order) => !isActiveOrder(order)));
   private listRevision = 0;
+  private readonly emailStates = signal<Record<string, OrderEmailStatus>>({});
+
+  emailStatusFor(orderId: string): OrderEmailStatus | null {
+    const userId = this.auth.currentUser()?.id;
+    return userId ? (this.emailStates()[`${userId}:${orderId}`] ?? null) : null;
+  }
+
+  /** Best effort: all notification failures resolve separately from the committed order. */
+  async sendOrderEmails(orderId: string): Promise<OrderEmailStatus> {
+    const userId = this.auth.currentUser()?.id;
+    if (!userId || !orderId.trim()) return parseOrderEmailStatus(null);
+    const key = `${userId}:${orderId}`;
+    this.emailStates.update((states) => ({
+      ...states,
+      [key]: { state: 'pending', customerEmailSent: null, adminEmailSent: null },
+    }));
+    let status: OrderEmailStatus;
+    try {
+      const { data, error } = await this.client.functions.invoke('send-order-emails', {
+        body: { order_id: orderId },
+        timeout: 45000,
+      });
+      let body: unknown = data;
+      // Non-2xx responses put the function's JSON in FunctionsHttpError.context.
+      if (
+        error &&
+        typeof error === 'object' &&
+        'context' in error &&
+        error.context instanceof Response
+      ) {
+        body = await error.context
+          .clone()
+          .json()
+          .catch(() => null);
+      }
+      status = parseOrderEmailStatus(body, !!error);
+    } catch {
+      status = parseOrderEmailStatus(null);
+    }
+    this.emailStates.update((states) => ({ ...states, [key]: status }));
+    return status;
+  }
+
+  /** TEMPORARY: browser-console helper. Guarded in production; never used by checkout. */
+  async sendOrderEmailsForDevelopment(orderId: string): Promise<OrderEmailStatus> {
+    if (!isDevMode()) throw new Error('This helper is available only in development.');
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId))
+      throw new Error('Provide an existing order UUID, not an order number.');
+    await this.auth.initialize();
+    const userId = this.auth.currentUser()?.id;
+    if (!userId) throw new Error('Sign in as the customer who owns this order.');
+    const { data, error } = await this.client
+      .from('orders')
+      .select('id, user_id')
+      .eq('id', orderId)
+      .eq('user_id', userId)
+      .maybeSingle<{ id: string; user_id: string }>();
+    if (
+      error ||
+      !data ||
+      data.id !== orderId ||
+      data.user_id !== userId ||
+      this.auth.currentUser()?.id !== userId
+    )
+      throw new Error('The existing order could not be verified for this customer.');
+    return this.sendOrderEmails(orderId);
+  }
 
   async placeOrder(request: PlaceOrderRequest): Promise<PlaceOrderResult> {
     if (this.placingOrder())

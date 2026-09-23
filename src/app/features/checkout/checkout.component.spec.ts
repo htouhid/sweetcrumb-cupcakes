@@ -19,6 +19,7 @@ const result = {
 describe('Pickup checkout', () => {
   const products = signal(TEST_PRODUCTS);
   const placeOrder = vi.fn();
+  const sendOrderEmails = vi.fn();
   const reload = vi.fn();
   const catalog = {
     products,
@@ -35,6 +36,9 @@ describe('Pickup checkout', () => {
     catalog.error.set(null);
     reload.mockReset().mockResolvedValue(undefined);
     placeOrder.mockReset().mockResolvedValue(result);
+    sendOrderEmails
+      .mockReset()
+      .mockResolvedValue({ state: 'sent', customerEmailSent: true, adminEmailSent: true });
     TestBed.configureTestingModule({
       providers: [
         provideRouter([]),
@@ -47,7 +51,10 @@ describe('Pickup checkout', () => {
             isAuthenticated: signal(true),
           },
         },
-        { provide: OrderService, useValue: { placeOrder, placingOrder: signal(false) } },
+        {
+          provide: OrderService,
+          useValue: { placeOrder, sendOrderEmails, placingOrder: signal(false) },
+        },
       ],
     });
   });
@@ -162,5 +169,49 @@ describe('Pickup checkout', () => {
     expect(cart.totalQuantity()).toBe(0);
     expect(placeOrder).toHaveBeenCalledTimes(1);
     expect(component.completed()).toBe(true);
+  });
+  it('keeps a committed order and cleared cart successful when email delivery fails', async () => {
+    sendOrderEmails.mockResolvedValue({
+      state: 'failed',
+      customerEmailSent: false,
+      adminEmailSent: false,
+    });
+    const { component, cart, navigate } = setup();
+    valid(component);
+    await component.submit();
+    TestBed.tick();
+    expect(sendOrderEmails).toHaveBeenCalledExactlyOnceWith(result.order_id);
+    expect(cart.totalQuantity()).toBe(0);
+    expect(localStorage.getItem('sweetcrumb-cart-v1')).toBeNull();
+    expect(reload).toHaveBeenCalledWith(true);
+    expect(component.completed()).toBe(true);
+    expect(component.error()).toBeNull();
+    expect(component.uncertain()).toBe(false);
+    expect(navigate).toHaveBeenCalledWith(['/order-confirmation', result.order_number]);
+  });
+  it('navigates before email delivery finishes and tolerates unexpected rejection', async () => {
+    let reject!: (error: Error) => void;
+    sendOrderEmails.mockImplementation(
+      () =>
+        new Promise((_resolve, fail) => {
+          reject = fail;
+        }),
+    );
+    const { component, cart, navigate } = setup();
+    valid(component);
+    await component.submit();
+    expect(navigate).toHaveBeenCalledWith(['/order-confirmation', result.order_number]);
+    reject(new Error('email transport failed'));
+    await Promise.resolve();
+    expect(cart.totalQuantity()).toBe(0);
+    expect(component.error()).toBeNull();
+    expect(component.completed()).toBe(true);
+  });
+  it('does not send notifications for a rejected order', async () => {
+    placeOrder.mockRejectedValue(new OrderPlacementError('Unavailable', true));
+    const { component } = setup();
+    valid(component);
+    await component.submit();
+    expect(sendOrderEmails).not.toHaveBeenCalled();
   });
 });

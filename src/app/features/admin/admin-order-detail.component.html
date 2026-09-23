@@ -1,0 +1,132 @@
+<a #backLink routerLink="/admin/orders" class="text-link">← All orders</a>
+@if (statusMessage(); as message) {
+  <p class="workflow-message" role="status">{{ message }}</p>
+}
+@if (statusError(); as message) {
+  <p class="workflow-message workflow-error" role="alert">{{ message }}</p>
+}
+@if (admin.loading() || admin.error()) {
+  <app-catalog-status
+    [loading]="admin.loading()"
+    [error]="admin.error()"
+    (retry)="admin.getOrders()"
+  />
+} @else if (order(); as order) {
+  <div class="detail-heading">
+    <div>
+      <p class="eyebrow">ORDER DETAILS</p>
+      <h2>{{ order.order_number }}</h2>
+      <p>Created {{ dateLabel(order.created_at) }}</p>
+    </div>
+    <span class="status">{{ labels[order.status] }}</span>
+  </div>
+  <section class="workflow" aria-labelledby="workflow-title">
+    <div>
+      <p class="eyebrow">BAKERY WORKFLOW</p>
+      <h3 id="workflow-title">Order Status</h3>
+      <p>
+        Current status: <strong>{{ labels[order.status] }}</strong>
+      </p>
+    </div>
+    @if (nextAction(); as action) {
+      <button
+        class="button button-primary"
+        type="button"
+        [disabled]="updating() || !!admin.updatingOrderId()"
+        (click)="requestStatusChange($event)"
+      >
+        {{ updating() ? 'Updating status…' : action.label }}
+      </button>
+    } @else {
+      <p>No further status actions are available.</p>
+    }
+  </section>
+  <div class="detail-grid">
+    <section class="detail-card">
+      <h3>Customer & pickup</h3>
+      <dl>
+        <dt>Name</dt>
+        <dd>{{ order.customer_name }}</dd>
+        <dt>Email</dt>
+        <dd>{{ order.customer_email }}</dd>
+        <dt>Phone</dt>
+        <dd>{{ order.customer_phone || 'Not provided' }}</dd>
+        <dt>Pickup Date</dt>
+        <dd>{{ dateLabel(order.pickup_date) }}</dd>
+        <dt>Pickup Time</dt>
+        <dd>{{ timeLabel(order.pickup_time) }}</dd>
+      </dl>
+      @if (order.special_instructions) {
+        <h3>Special Instructions</h3>
+        <p class="instructions">{{ order.special_instructions }}</p>
+      }
+    </section>
+    <section class="detail-card">
+      <h3>Order Items</h3>
+      @if (loadingItems()) {
+        <p role="status">Loading order items…</p>
+      } @else if (itemError(); as message) {
+        <div role="alert">
+          <p>{{ message }}</p>
+          <button class="button button-outline" (click)="retryItems()">Try again</button>
+        </div>
+      } @else {
+        @for (item of items(); track item.id) {
+          <article class="item">
+            <div>
+              <h4>{{ item.product_name }}</h4>
+              <p>Quantity: {{ item.quantity }} · Unit price: {{ item.unit_price | currency }}</p>
+            </div>
+            <div>
+              <span>Line total</span><strong>{{ item.total | currency }}</strong>
+            </div>
+          </article>
+        } @empty {
+          <p>No item details are available for this order.</p>
+        }
+      }
+      <div class="total">
+        <span>Order Total</span><strong>{{ order.subtotal | currency }}</strong>
+      </div>
+    </section>
+  </div>
+} @else {
+  <div class="empty-state">
+    <h2>We couldn’t find this order.</h2>
+    <p>It may no longer be available to this account.</p>
+    <a routerLink="/admin/orders" class="button button-primary">Back to orders</a>
+  </div>
+}
+
+<dialog
+  #confirmation
+  aria-labelledby="confirmation-title"
+  aria-describedby="confirmation-description"
+  (cancel)="onDialogCancel($event)"
+>
+  <p class="eyebrow">A LITTLE CHECK BEFORE THE NEXT STEP</p>
+  <h2 id="confirmation-title">{{ selectedAction()?.action?.confirmation }}</h2>
+  <p id="confirmation-description">
+    Order {{ selectedAction()?.orderNumber }} will move to
+    {{ selectedAction() ? labels[selectedAction()!.action.target] : '' }}.
+  </p>
+  <p role="status" aria-live="polite">{{ updating() ? 'Updating the order. Please wait…' : '' }}</p>
+  <div class="dialog-actions">
+    <button
+      class="button button-outline"
+      type="button"
+      autofocus
+      [disabled]="updating()"
+      (click)="dismissConfirmation()"
+    >
+      Keep current status</button
+    ><button
+      class="button button-primary"
+      type="button"
+      [disabled]="updating()"
+      (click)="confirmStatusChange()"
+    >
+      {{ updating() ? 'Updating…' : selectedAction()?.action?.label }}
+    </button>
+  </div>
+</dialog>

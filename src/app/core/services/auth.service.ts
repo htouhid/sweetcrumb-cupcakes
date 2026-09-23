@@ -63,6 +63,15 @@ export class AuthService {
     return (this.initialization ??= this.restoreSession());
   }
 
+  /** Wait for the latest profile request, including auth events during initialization. */
+  async whenProfileReady(): Promise<void> {
+    let task: Promise<void>;
+    do {
+      task = this.profileTask;
+      await task;
+    } while (task !== this.profileTask);
+  }
+
   private async restoreSession(): Promise<void> {
     const revision = this.revision;
     try {

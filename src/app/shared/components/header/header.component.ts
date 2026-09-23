@@ -38,6 +38,9 @@ import { CartService } from '../../../core/services/cart.service';
               <div class="account-menu" id="account-menu" aria-label="Account actions">
                 <a routerLink="/account" (click)="accountOpen.set(false)">My Account</a>
                 <a routerLink="/account" (click)="accountOpen.set(false)">My Orders</a>
+                @if (auth.isAdmin()) {
+                  <a routerLink="/admin" (click)="accountOpen.set(false)">Admin Dashboard</a>
+                }
                 <button (click)="signOut()" [disabled]="auth.authLoading()">
                   {{ auth.authLoading() ? 'Signing out…' : 'Sign Out' }}
                 </button>
